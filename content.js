@@ -56,113 +56,130 @@
         return priceInput;
         //DEBUGGING: if (priceInput) { console.log('Found price input:', priceInput); } else { console.log('Price input not found.'); }
     }
-    function findElementByText(selector, searchText) {
-        // Get all elements that match the selector
-        const elements = document.querySelectorAll(selector);
 
-        // Iterate through the elements
-        for (let element of elements) {
-            if (element.textContent.includes(searchText)) {
-                return element; // Return the matching element
+
+    async function checkIfAlreadyExists(finalName) {
+        await new Promise(async (res2) => {
+            var search = document.querySelector('input[placeholder="Search Materiales"]');
+            search.value = finalName;
+            search.dispatchEvent(new Event('input', { bubbles: true }));
+            search.dispatchEvent(new Event('change', { bubbles: true }));
+            search.dispatchEvent(new KeyboardEvent('keydown', {
+                key: 'a',
+                bubbles: true,
+                cancelable: true
+            }));
+            setTimeout(res2, 1000);
+        });//.finally
+        const labels = document.querySelectorAll('[data-test="ListElement.Label"]');
+        for (var found of labels) {
+            console.log(found.innerText);
+            if (found.innerText == finalName) {
+                return true;
             }
         }
-
-        return null; // Return null if no match is found
+        return false;
     }
 
-    async function createMaterial(material) {
-        const [productId, rawName, description, price, qty, location, partNumber, date] = material;
+    async function tryCreateMaterial(material) {
+        await new Promise(async (res, rej) => {
+            const [productId, rawName, description, price, qty, location, partNumber, date] = material;
 
-        // Construct name with Year + Month (assuming date is YYYY-MM-DD or similar):
-        //const d = new Date(date);
-        const d = new Date();
-        const year = d.getFullYear();
-        const month = (d.getMonth() + 1).toString().padStart(2, '0');
-        const finalName = `${rawName} ${year}${month}`;
-
-        // Click the New Material button to open the form
-        newMaterialButton.click();
-
-        // Wait for modal/form to appear - adjust selectors as needed
-        //await waitForSelector('input[name="materialName"]');
-        await waitForSelector('input[placeholder="Enter Material Name"]');
-
-        const nameInput = document.querySelector('input[placeholder="Enter Material Name"]');
-        const priceInput = inputByLabelText("Unit Cost");
-        const qtyInput = inputByLabelText("Units in Stock");
-        const locationInput = inputByLabelText("Location");
-
-        // Fill in the form
-        nameInput.value = finalName;
-        nameInput.dispatchEvent(new Event('input', { bubbles: true }));
-
-        priceInput.value = price;
-        priceInput.dispatchEvent(new Event('input', { bubbles: true }));
-
-        qtyInput.value = qty;
-        qtyInput.dispatchEvent(new Event('input', { bubbles: true }));
+            // Construct name with Year + Month (assuming date is YYYY-MM-DD or similar):
+            //const d = new Date(date);
+            const d = new Date();
+            const year = d.getFullYear();
+            const month = (d.getMonth() + 1).toString().padStart(2, '0');
+            const finalName = `${rawName}-${year}-${month}`;
 
 
-        const locationLabel = inputByLabelText("Location");
-        locationLabel.dispatchEvent(new Event('click', { bubbles: true }));
+            var found = await checkIfAlreadyExists(finalName);
+            if (found) {
+                res();
+            } else {
 
-        const overallLocationInput = document.querySelector('[data-test="Select.Location"]');
-        const chevronLocation = overallLocationInput.querySelector('svg[data-test="Select.Chevron"]');
+                newMaterialButton.click();
+                await waitForSelector('input[placeholder="Enter Material Name"]');
 
-        if (locationInput) {
-            locationInput.value = location.trim();
+                const nameInput = document.querySelector('input[placeholder="Enter Material Name"]');
+                const priceInput = inputByLabelText("Unit Cost");
+                const qtyInput = inputByLabelText("Units in Stock");
+                const locationInput = inputByLabelText("Location");
 
-            const spaceEvent = new KeyboardEvent('keydown', {
-                key: ' ',        // Represents the character for the Space key
-                code: 'Space',   // The physical key code for the Space key
-                keyCode: 32,     // Legacy keyCode for the Space key
-                bubbles: true,   // Ensures the event bubbles up the DOM
-                cancelable: true // Allows the event to be canceled
-            });
-            locationInput.dispatchEvent(spaceEvent);
+                // Fill in the form
+                nameInput.value = finalName;
+                nameInput.dispatchEvent(new Event('input', { bubbles: true }));
 
-            //await waitForSelector('[data-test="Select.Options"]');
+                priceInput.value = price;
+                priceInput.dispatchEvent(new Event('input', { bubbles: true }));
+
+                qtyInput.value = qty;
+                qtyInput.dispatchEvent(new Event('input', { bubbles: true }));
 
 
-            const locationOptions = document.querySelector('[data-test="Select.Options"]');
-            console.log("options %o", locationOptions);
-            var locationOption = findElementByText(location.trim());
-            console.log("option %o", locationOption);
-            //locationOption.dispatchEvent(new Event('change', { bubbles: true }));
-            /*
-                        for (const opt of locationInput.options) {
+                await new Promise(async (res) => {
+                    if (locationInput) {
+                        //locationInput.value = location.trim();
+                        /*
+                                    const spaceEvent = new KeyboardEvent('keydown', {
+                                        key: ' ',        // Represents the character for the Space key
+                                        code: 'Space',   // The physical key code for the Space key
+                                        keyCode: 32,     // Legacy keyCode for the Space key
+                                        bubbles: true,   // Ensures the event bubbles up the DOM
+                                        cancelable: true // Allows the event to be canceled
+                                    });
+                        */
+                        const spaceEvent = new KeyboardEvent('keydown', {
+                            key: 'a',
+                            bubbles: true,
+                            cancelable: true
+                        });
+                        locationInput.dispatchEvent(spaceEvent);
+                        locationInput.click();
+                        locationInput.focus();
+
+                        await waitForSelector('[data-test="Select.Row"]');
+
+                        const locationOptions = document.querySelectorAll('[data-test="Select.Row"]');
+                        for (const opt of locationOptions) {
+                            console.log("option %o", opt);
                             if (opt.textContent.trim() === location.trim()) {
-                                opt.selected = true;
+                                //opt.selected = true;
+                                opt.click();
+                                locationInput.value = location.trim(); // redundant?
+                                opt.dispatchEvent(new Event('click', { bubbles: true }));
+                                locationInput.dispatchEvent(new Event('click', { bubbles: true }));
                                 locationInput.dispatchEvent(new Event('change', { bubbles: true }));
+                                console.log('selected: ' + opt.textContent);
                                 break;
                             }
                         }
-            */
-        }
+                    }
+                    setTimeout(res, 2000);
+                });
+                const createButton = document.evaluate(
+                    "//*[text()='Create']",
+                    document,
+                    null,
+                    XPathResult.FIRST_ORDERED_NODE_TYPE,
+                    null
+                ).singleNodeValue;
+                if (createButton) {
+                    createButton.click();
+                }
 
-        const createButton = document.evaluate(
-            "//*[text()='Create']",
-            document,
-            null,
-            XPathResult.FIRST_ORDERED_NODE_TYPE,
-            null
-        ).singleNodeValue;
-        if (createButton) {
-            createButton.click();
-        }
-
-        // Wait for creation to complete (this might require observing a success message or DOM change)
-        // For now, just wait a bit before proceeding to next material
-        await new Promise(res => setTimeout(res, 2000));
+                setTimeout(res, 1000);
+            }
+        });
     }
 
     // Loop through each row, skip header if present
     for (let i = 1; i < materialsData.length; i++) {
         const row = materialsData[i];
         if (row && row.length > 1) {
-            await createMaterial(row);
+            await tryCreateMaterial(row);
         }
     }
 
-    console.log("All materials processed");
+    console.log("All (new) materials processed");
 })();

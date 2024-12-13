@@ -1,5 +1,5 @@
-document.getElementById('uploadBtn').addEventListener('click', () => {
-    const fileInput = document.getElementById('fileInput');
+const fileInput = document.getElementById('fileInput');
+fileInput.addEventListener('change', () => {
     const statusElement = document.getElementById('status');
     const previewElement = document.getElementById('preview');
 
@@ -19,6 +19,9 @@ document.getElementById('uploadBtn').addEventListener('click', () => {
         // Save data to Chrome storage
         chrome.storage.sync.set({ materialsData: rows }, () => {
             statusElement.textContent = "Data cargada.";
+
+            const executeBtn = document.getElementById('executeBtn');
+            executeBtn.removeAttribute('disabled');
         });
 
         // Clear the preview container and add a few rows to preview
