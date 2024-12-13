@@ -1,0 +1,20 @@
+{
+    "name": "Bulk Material Uploader",
+    "version": "1.0",
+    "description": "Uploads bulk materials from a CSV to app.getmaintainx.com",
+    "manifest_version": 3,
+    "permissions": [
+        "scripting",
+        "storage",
+        "activeTab"
+    ],
+    "action": {
+        "default_popup": "popup.html"
+    },
+    "host_permissions": [
+        "https://app.getmaintainx.com/*"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    }
+}
