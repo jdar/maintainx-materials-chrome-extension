@@ -93,83 +93,89 @@
             //const finalName = `${rawName}-${year}-${month}`;
             const finalName = `${rawName}`;
 
-
-            var found = await checkIfAlreadyExists(finalName);
-            if (found) {
+            if (finalName == 'Part Name') {
+                res();
+            } else if (finalName.trim() == '') {
                 res();
             } else {
 
-                newMaterialButton.click();
-                await waitForSelector('input[placeholder="Enter Material Name"]');
+                var found = await checkIfAlreadyExists(finalName);
+                if (found) {
+                    res();
+                } else {
 
-                const nameInput = document.querySelector('input[placeholder="Enter Material Name"]');
-                const priceInput = inputByLabelText("Unit Cost");
-                const qtyInput = inputByLabelText("Units in Stock");
-                const locationInput = inputByLabelText("Location");
+                    newMaterialButton.click();
+                    await waitForSelector('input[placeholder="Enter Material Name"]');
 
-                // Fill in the form
-                nameInput.value = finalName;
-                nameInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    const nameInput = document.querySelector('input[placeholder="Enter Material Name"]');
+                    const priceInput = inputByLabelText("Unit Cost");
+                    const qtyInput = inputByLabelText("Units in Stock");
+                    const locationInput = inputByLabelText("Location");
 
-                priceInput.value = price;
-                priceInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    // Fill in the form
+                    nameInput.value = finalName;
+                    nameInput.dispatchEvent(new Event('input', { bubbles: true }));
 
-                qtyInput.value = qty;
-                qtyInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    priceInput.value = price;
+                    priceInput.dispatchEvent(new Event('input', { bubbles: true }));
+
+                    qtyInput.value = qty;
+                    qtyInput.dispatchEvent(new Event('input', { bubbles: true }));
 
 
-                await new Promise(async (res) => {
-                    if (locationInput) {
-                        //locationInput.value = location.trim();
-                        /*
-                                    const spaceEvent = new KeyboardEvent('keydown', {
-                                        key: ' ',        // Represents the character for the Space key
-                                        code: 'Space',   // The physical key code for the Space key
-                                        keyCode: 32,     // Legacy keyCode for the Space key
-                                        bubbles: true,   // Ensures the event bubbles up the DOM
-                                        cancelable: true // Allows the event to be canceled
-                                    });
-                        */
-                        const spaceEvent = new KeyboardEvent('keydown', {
-                            key: 'a',
-                            bubbles: true,
-                            cancelable: true
-                        });
-                        locationInput.dispatchEvent(spaceEvent);
-                        locationInput.click();
-                        locationInput.focus();
+                    await new Promise(async (res) => {
+                        if (locationInput) {
+                            //locationInput.value = location.trim();
+                            /*
+                                        const spaceEvent = new KeyboardEvent('keydown', {
+                                            key: ' ',        // Represents the character for the Space key
+                                            code: 'Space',   // The physical key code for the Space key
+                                            keyCode: 32,     // Legacy keyCode for the Space key
+                                            bubbles: true,   // Ensures the event bubbles up the DOM
+                                            cancelable: true // Allows the event to be canceled
+                                        });
+                            */
+                            const spaceEvent = new KeyboardEvent('keydown', {
+                                key: 'a',
+                                bubbles: true,
+                                cancelable: true
+                            });
+                            locationInput.dispatchEvent(spaceEvent);
+                            locationInput.click();
+                            locationInput.focus();
 
-                        await waitForSelector('[data-test="Select.Row"]');
+                            await waitForSelector('[data-test="Select.Row"]');
 
-                        const locationOptions = document.querySelectorAll('[data-test="Select.Row"]');
-                        for (const opt of locationOptions) {
-                            console.log("option %o", opt);
-                            if (opt.textContent.trim() === location.trim()) {
-                                //opt.selected = true;
-                                opt.click();
-                                locationInput.value = location.trim(); // redundant?
-                                opt.dispatchEvent(new Event('click', { bubbles: true }));
-                                locationInput.dispatchEvent(new Event('click', { bubbles: true }));
-                                locationInput.dispatchEvent(new Event('change', { bubbles: true }));
-                                console.log('selected: ' + opt.textContent);
-                                break;
+                            const locationOptions = document.querySelectorAll('[data-test="Select.Row"]');
+                            for (const opt of locationOptions) {
+                                console.log("option %o", opt);
+                                if (opt.textContent.trim() === location.trim()) {
+                                    //opt.selected = true;
+                                    opt.click();
+                                    locationInput.value = location.trim(); // redundant?
+                                    opt.dispatchEvent(new Event('click', { bubbles: true }));
+                                    locationInput.dispatchEvent(new Event('click', { bubbles: true }));
+                                    locationInput.dispatchEvent(new Event('change', { bubbles: true }));
+                                    console.log('selected: ' + opt.textContent);
+                                    break;
+                                }
                             }
                         }
+                        setTimeout(res, 2000);
+                    });
+                    const createButton = document.evaluate(
+                        "//*[text()='Create']",
+                        document,
+                        null,
+                        XPathResult.FIRST_ORDERED_NODE_TYPE,
+                        null
+                    ).singleNodeValue;
+                    if (createButton) {
+                        createButton.click();
                     }
-                    setTimeout(res, 2000);
-                });
-                const createButton = document.evaluate(
-                    "//*[text()='Create']",
-                    document,
-                    null,
-                    XPathResult.FIRST_ORDERED_NODE_TYPE,
-                    null
-                ).singleNodeValue;
-                if (createButton) {
-                    createButton.click();
-                }
 
-                setTimeout(res, 1000);
+                    setTimeout(res, 1000);
+                }
             }
         });
     }
