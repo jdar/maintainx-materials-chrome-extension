@@ -1,4 +1,4 @@
-product_id,name,description,price,quantity,location
-1001,PRUEBA-A,A small widget.,9.99,100,BE Warehouse Isabela
-1002,PRUEBA-B,A medium widget.,14.49,50,BE Warehouse Isabela
-1003,PRUEBA-C,A large widget.,24.99,25,BE Warehouse Isabela
+name,price,quantity,location
+PRUEBA-A,9.99,100,BE Warehouse Isabela
+PRUEBA-B,14.49,50,BE Warehouse Isabela
+PRUEBA-C,24.99,25,BE Warehouse Isabela

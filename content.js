@@ -83,14 +83,15 @@
 
     async function tryCreateMaterial(material) {
         await new Promise(async (res, rej) => {
-            const [productId, rawName, description, price, qty, location, partNumber, date] = material;
+            const [rawName, price, qty, location, partNumber, date] = material;
 
             // Construct name with Year + Month (assuming date is YYYY-MM-DD or similar):
             //const d = new Date(date);
             const d = new Date();
             const year = d.getFullYear();
             const month = (d.getMonth() + 1).toString().padStart(2, '0');
-            const finalName = `${rawName}-${year}-${month}`;
+            //const finalName = `${rawName}-${year}-${month}`;
+            const finalName = `${rawName}`;
 
 
             var found = await checkIfAlreadyExists(finalName);
